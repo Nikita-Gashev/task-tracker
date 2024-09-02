@@ -1,10 +1,12 @@
 package ru.yandex.task_traker.model;
 
+import ru.yandex.task_traker.util.TaskStatus;
+
 public class Task {
     protected String name;
     protected String description;
     protected int id;
-    protected String status = "NEW";
+    protected TaskStatus status = TaskStatus.NEW;
 
     @Override
     public String toString() {
@@ -29,11 +31,19 @@ public class Task {
         this.id = id;
     }
 
-    public String getStatus() {
+    public TaskStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(TaskStatus status) {
         this.status = status;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
