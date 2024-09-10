@@ -15,6 +15,7 @@ public class Starter {
     final Subtask subtask1 = new Subtask("Подзадача 1", "Подзадача 1 епика 1", epic1);
     final Subtask subtask2 = new Subtask("Подзадача 2", "Подзадача 2 епика 1", epic1);
     final Subtask subtask3 = new Subtask("Подзадача 3", "Подзадача 3 епика 2", epic2);
+    final Subtask subtask4 = new Subtask("Подзадача 4", "Подзадача 4 епика 1", epic1);
 
     public void test1() {
         manager.createTask(task1);
@@ -24,6 +25,7 @@ public class Starter {
         manager.createSubtask(subtask1);
         manager.createSubtask(subtask2);
         manager.createSubtask(subtask3);
+        manager.createSubtask(subtask4);
 
         System.out.println(manager.getTasksList());
         System.out.println(manager.getEpicList());
@@ -44,6 +46,38 @@ public class Starter {
         System.out.println(manager.getTasksList());
         System.out.println(manager.getEpicList());
         System.out.println(manager.getSubtaskList());
+        System.out.println();
+
+        subtask4.setStatus(TaskStatus.DONE);
+        manager.updateSubtask(subtask4);
+
+        System.out.println(manager.getEpicList());
+        System.out.println();
+
+        subtask2.setStatus(TaskStatus.DONE);
+        manager.updateSubtask(subtask2);
+
+        System.out.println(manager.getEpicList());
+        System.out.println();
+
+        subtask1.setStatus(TaskStatus.DONE);
+        manager.updateSubtask(subtask1);
+
+        System.out.println(manager.getEpicList());
+        System.out.println();
+
+        subtask1.setStatus(TaskStatus.NEW);
+        manager.updateSubtask(subtask1);
+
+        System.out.println(manager.getEpicList());
+        System.out.println();
+
+        subtask2.setStatus(TaskStatus.NEW);
+        manager.updateSubtask(subtask2);
+        subtask4.setStatus(TaskStatus.NEW);
+        manager.updateSubtask(subtask4);
+
+        System.out.println(manager.getEpicList());
         System.out.println();
 
         manager.removeTask(2);

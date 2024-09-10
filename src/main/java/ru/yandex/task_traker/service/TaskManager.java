@@ -82,33 +82,36 @@ public class TaskManager {
     }
 
     public void updateSubtask(Subtask subtask) {
-        if (!(subtasks.containsValue(subtask))) {
+        if (!subtasks.containsKey(subtask.getId())) {
             throw new IllegalArgumentException("Подзадача отсутствует в списке");
-        } else {
-            subtasks.put(subtask.getId(), subtask);
-            if (subtask.getStatus().equals(TaskStatus.IN_PROGRESS)) {
-                subtask.getEpic().setStatus(TaskStatus.IN_PROGRESS);
-            } else if (subtask.getStatus().equals(TaskStatus.DONE)) {
-                TaskStatus statusEpic = TaskStatus.DONE;
-                for (Subtask subtaskForChecking : subtask.getEpic().getSubtasks()) {
-                    if (subtaskForChecking.getStatus().equals(TaskStatus.DONE)) {
-                        statusEpic = TaskStatus.DONE;
-                    } else {
-                        statusEpic = TaskStatus.IN_PROGRESS;
-                    }
-                }
-                subtask.getEpic().setStatus(statusEpic);
+        }
+        subtasks.put(subtask.getId(), subtask);
+        assignStatusForEpic(subtask);
+
+    }
+
+    private void assignStatusForEpic(Subtask subtask) {
+
+        boolean epicDone = false;
+        boolean epicNew = false;
+
+        for (Subtask subtaskForChecking : subtask.getEpic().getSubtasks()) {
+            if (subtaskForChecking.getStatus().equals(TaskStatus.DONE)) {
+                epicDone = true;
+            } else if (subtaskForChecking.getStatus().equals(TaskStatus.NEW)) {
+                epicNew = true;
             } else {
-                TaskStatus statusEpic = TaskStatus.NEW;
-                for (Subtask subtask1 : subtask.getEpic().getSubtasks()) {
-                    if (subtask1.getStatus().equals(TaskStatus.NEW)) {
-                        statusEpic = TaskStatus.NEW;
-                    } else {
-                        statusEpic = TaskStatus.IN_PROGRESS;
-                    }
-                }
-                subtask.getEpic().setStatus(statusEpic);
+                subtask.getEpic().setStatus(TaskStatus.IN_PROGRESS);
+                break;
             }
+        }
+
+        if (epicDone & !epicNew) {
+            subtask.getEpic().setStatus(TaskStatus.DONE);
+        } else if (!epicDone & epicNew) {
+            subtask.getEpic().setStatus(TaskStatus.NEW);
+        } else {
+            subtask.getEpic().setStatus(TaskStatus.IN_PROGRESS);
         }
     }
 
@@ -118,27 +121,7 @@ public class TaskManager {
         } else {
             Subtask subtask = subtasks.get(id);
             subtask.getEpic().removeSubtasks(subtask);
-            TaskStatus statusEpic = subtask.getEpic().getStatus();
-            if (subtask.getEpic().getSubtasks().isEmpty()) {
-                subtask.getEpic().setStatus(TaskStatus.NEW);
-            } else if (statusEpic.equals(TaskStatus.IN_PROGRESS)) {
-                for (Subtask subtaskForChecking : subtask.getEpic().getSubtasks()) {
-                    if (subtaskForChecking.getStatus().equals(TaskStatus.DONE)) {
-                        statusEpic = TaskStatus.DONE;
-                    } else if (subtaskForChecking.getStatus().equals(TaskStatus.NEW)) {
-                        for (Subtask subtask2 : subtask.getEpic().getSubtasks()) {
-                            if (subtask2.getStatus().equals(TaskStatus.NEW)) {
-                                statusEpic = TaskStatus.NEW;
-                            } else {
-                                statusEpic = TaskStatus.IN_PROGRESS;
-                            }
-                        }
-                    } else {
-                        statusEpic = TaskStatus.IN_PROGRESS;
-                    }
-                    subtask.getEpic().setStatus(statusEpic);
-                }
-            }
+            assignStatusForEpic(subtask);
         }
         subtasks.remove(id);
     }
