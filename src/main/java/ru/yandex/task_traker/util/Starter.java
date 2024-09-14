@@ -6,7 +6,7 @@ import ru.yandex.task_traker.model.Task;
 import ru.yandex.task_traker.service.TaskManager;
 
 public class Starter {
-    TaskManager manager = new TaskManager();
+    TaskManager manager = Managers.getDefault();
 
     final Task task1 = new Task("Задча 1", "Описание задачи 1");
     final Task task2 = new Task("Задча 2", "Описание задачи 2");
@@ -35,12 +35,11 @@ public class Starter {
         System.out.println();
 
         task1.setStatus(TaskStatus.IN_PROGRESS);
+        manager.updateTask(task1);
         subtask1.setStatus(TaskStatus.IN_PROGRESS);
+        manager.updateSubtask(subtask1);
         epic1.setName("Епик 1 с новым названием");
         epic1.setDescription("Новое описание епика 1");
-
-        manager.updateTask(task1);
-        manager.updateSubtask(subtask1);
         manager.updateEpic(epic1);
 
         System.out.println(manager.getTasksList());
@@ -50,32 +49,10 @@ public class Starter {
 
         subtask4.setStatus(TaskStatus.DONE);
         manager.updateSubtask(subtask4);
-
-        System.out.println(manager.getEpicList());
-        System.out.println();
-
         subtask2.setStatus(TaskStatus.DONE);
         manager.updateSubtask(subtask2);
-
-        System.out.println(manager.getEpicList());
-        System.out.println();
-
         subtask1.setStatus(TaskStatus.DONE);
         manager.updateSubtask(subtask1);
-
-        System.out.println(manager.getEpicList());
-        System.out.println();
-
-        subtask1.setStatus(TaskStatus.NEW);
-        manager.updateSubtask(subtask1);
-
-        System.out.println(manager.getEpicList());
-        System.out.println();
-
-        subtask2.setStatus(TaskStatus.NEW);
-        manager.updateSubtask(subtask2);
-        subtask4.setStatus(TaskStatus.NEW);
-        manager.updateSubtask(subtask4);
 
         System.out.println(manager.getEpicList());
         System.out.println();
@@ -92,6 +69,9 @@ public class Starter {
         System.out.println(manager.getTaskById(1));
         System.out.println(manager.getEpicById(3));
         System.out.println(manager.getSubtaskById(6));
+        System.out.println();
+
+        System.out.println(manager.getHistory());
         System.out.println();
 
         manager.removeAllTasks();
