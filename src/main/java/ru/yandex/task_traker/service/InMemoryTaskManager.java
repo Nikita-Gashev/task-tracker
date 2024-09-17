@@ -16,7 +16,7 @@ public class InMemoryTaskManager implements TaskManager {
     private final Map<Integer, Subtask> subtasks = new HashMap<>();
     private final Map<Integer, Epic> epics = new HashMap<>();
     private int id = 0;
-    private final HistoryManager history = Managers.getDefaultHistory();
+    private final HistoryManager historyManager = Managers.getDefaultHistory();
 
     @Override
     public List<Task> getTasksList() {
@@ -25,6 +25,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeAllTasks() {
+        for (int id : tasks.keySet()) {
+            historyManager.remove(id);
+        }
         tasks.clear();
     }
 
@@ -33,7 +36,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (tasks.get(id) == null) {
             throw new IllegalArgumentException("Введено некорретное значение индентификатора");
         } else {
-            history.add(tasks.get(id));
+            historyManager.add(tasks.get(id));
             return tasks.get(id);
         }
     }
@@ -60,6 +63,7 @@ public class InMemoryTaskManager implements TaskManager {
             throw new IllegalArgumentException("Введено некорретное значение индентификатора");
         } else {
             tasks.remove(id);
+            historyManager.remove(id);
         }
     }
 
@@ -70,6 +74,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeAllSubtasks() {
+        for (int id : subtasks.keySet()) {
+            historyManager.remove(id);
+        }
         subtasks.clear();
         for (Epic epic : epics.values()) {
             epic.getSubtasks().clear();
@@ -82,7 +89,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (subtasks.get(id) == null) {
             throw new IllegalArgumentException("Введено некорретное значение индентификатора");
         } else {
-            history.add(subtasks.get(id));
+            historyManager.add(subtasks.get(id));
             return subtasks.get(id);
         }
     }
@@ -115,6 +122,7 @@ public class InMemoryTaskManager implements TaskManager {
             assignStatusForEpic(subtask);
         }
         subtasks.remove(id);
+        historyManager.remove(id);
     }
 
     @Override
@@ -124,6 +132,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeAllEpics() {
+        removeAllSubtasks();
+        for (int id : epics.keySet()) {
+            historyManager.remove(id);
+        }
         epics.clear();
     }
 
@@ -132,7 +144,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (epics.get(id) == null) {
             throw new IllegalArgumentException("Введено некорретное значение индентификатора");
         } else {
-            history.add(epics.get(id));
+            historyManager.add(epics.get(id));
             return epics.get(id);
         }
     }
@@ -161,8 +173,10 @@ public class InMemoryTaskManager implements TaskManager {
             Epic epic = epics.get(id);
             for (Subtask subtask : epic.getSubtasks()) {
                 subtasks.remove(subtask.getId());
+                historyManager.remove(subtask.getId());
             }
             epics.remove(id);
+            historyManager.remove(id);
         }
     }
 
@@ -173,7 +187,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<Task> getHistory() {
-        return history.getHistory();
+        return historyManager.getHistory();
     }
 
     private void assignStatusForEpic(Subtask subtask) {

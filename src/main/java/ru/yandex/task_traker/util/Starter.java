@@ -42,28 +42,7 @@ public class Starter {
         epic1.setDescription("Новое описание епика 1");
         manager.updateEpic(epic1);
 
-        System.out.println(manager.getTasksList());
-        System.out.println(manager.getEpicList());
-        System.out.println(manager.getSubtaskList());
-        System.out.println();
-
-        subtask4.setStatus(TaskStatus.DONE);
-        manager.updateSubtask(subtask4);
-        subtask2.setStatus(TaskStatus.DONE);
-        manager.updateSubtask(subtask2);
-        subtask1.setStatus(TaskStatus.DONE);
-        manager.updateSubtask(subtask1);
-
-        System.out.println(manager.getEpicList());
-        System.out.println();
-
-        manager.removeTask(2);
-        manager.removeSubtask(5);
-        manager.removeEpic(4);
-
-        System.out.println(manager.getTasksList());
-        System.out.println(manager.getEpicList());
-        System.out.println(manager.getSubtaskList());
+        System.out.println(manager.getHistory());
         System.out.println();
 
         System.out.println(manager.getTaskById(1));
@@ -74,13 +53,14 @@ public class Starter {
         System.out.println(manager.getHistory());
         System.out.println();
 
+        manager.removeTask(1);
+        manager.removeEpic(3);
+
+        System.out.println(manager.getHistory());
+        System.out.println();
+
         manager.removeAllTasks();
         manager.removeAllSubtasks();
         manager.removeAllEpics();
-
-        System.out.println(manager.getTasksList());
-        System.out.println(manager.getEpicList());
-        System.out.println(manager.getSubtaskList());
-        System.out.println();
     }
 }
