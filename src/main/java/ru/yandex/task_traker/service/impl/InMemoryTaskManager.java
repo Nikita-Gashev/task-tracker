@@ -1,8 +1,10 @@
-package ru.yandex.task_traker.service;
+package ru.yandex.task_traker.service.impl;
 
 import ru.yandex.task_traker.model.Epic;
 import ru.yandex.task_traker.model.Subtask;
 import ru.yandex.task_traker.model.Task;
+import ru.yandex.task_traker.service.HistoryManager;
+import ru.yandex.task_traker.service.TaskManager;
 import ru.yandex.task_traker.util.Managers;
 import ru.yandex.task_traker.util.TaskStatus;
 
@@ -109,7 +111,6 @@ public class InMemoryTaskManager implements TaskManager {
         }
         subtasks.put(subtask.getId(), subtask);
         assignStatusForEpic(subtask);
-
     }
 
     @Override

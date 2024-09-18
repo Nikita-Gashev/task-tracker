@@ -1,8 +1,8 @@
 package ru.yandex.task_traker.util;
 
 import ru.yandex.task_traker.service.HistoryManager;
-import ru.yandex.task_traker.service.InMemoryHistoryManager;
-import ru.yandex.task_traker.service.InMemoryTaskManager;
+import ru.yandex.task_traker.service.impl.InMemoryHistoryManager;
+import ru.yandex.task_traker.service.impl.InMemoryTaskManager;
 import ru.yandex.task_traker.service.TaskManager;
 
 public class Managers {

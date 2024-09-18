@@ -1,7 +1,7 @@
-package ru.yandex.task_traker.service;
+package ru.yandex.task_traker.service.impl;
 
-import ru.yandex.task_traker.model.Node;
 import ru.yandex.task_traker.model.Task;
+import ru.yandex.task_traker.service.HistoryManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,6 +62,9 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void add(Task task) {
+        if (size > 10) {
+            removeNode(head);
+        }
         if (viewedTask.containsKey(task.getId())) {
             removeNode(viewedTask.get(task.getId()));
             viewedTask.put(task.getId(), linkLast(task));
@@ -79,5 +82,37 @@ public class InMemoryHistoryManager implements HistoryManager {
     @Override
     public List<Task> getHistory() {
         return getTasks();
+    }
+
+    private static class Node<E> {
+        private final E data;
+        private Node<E> next;
+        private Node<E> prev;
+
+        private Node(E data, Node<E> next, Node<E> prev) {
+            this.data = data;
+            this.next = next;
+            this.prev = prev;
+        }
+
+        private E getData() {
+            return data;
+        }
+
+        private Node<E> getNext() {
+            return next;
+        }
+
+        private void setNext(Node<E>next) {
+            this.next = next;
+        }
+
+        private Node<E> getPrev() {
+            return prev;
+        }
+
+        private void setPrev(Node<E>prev) {
+            this.prev = prev;
+        }
     }
 }
