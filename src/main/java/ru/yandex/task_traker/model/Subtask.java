@@ -1,24 +1,31 @@
 package ru.yandex.task_traker.model;
 
+import ru.yandex.task_traker.util.TaskType;
+
 public class Subtask extends Task {
-    private Epic epic;
+    private int epicId;
+
+    public Subtask(String name, String description, int epicId) {
+        super(name, description);
+        this.epicId = epicId;
+    }
+
+    private Subtask(String id, String name, String description, String status, String epicId) {
+        super(id, name, description, status);
+        this.epicId = Integer.parseInt(epicId);
+    }
+
+    public static Subtask makeSubtaskFromString (String value) {
+        String[] splitValue = value.split(",");
+        return new Subtask(splitValue[0], splitValue[2], splitValue[4], splitValue[3],splitValue[5]);
+    }
+
+    public int getEpicId() {
+        return epicId;
+    }
 
     @Override
     public String toString() {
-        return "Subtask{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", id=" + id +
-                ", status='" + status + '\'' +
-                '}';
-    }
-
-    public Subtask(String name, String description, Epic epic) {
-        super(name, description);
-        this.epic = epic;
-    }
-
-    public Epic getEpic() {
-        return epic;
+        return id + "," + TaskType.SUBTASK + "," + name + "," + status + "," + description + "," + epicId;
     }
 }

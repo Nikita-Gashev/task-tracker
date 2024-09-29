@@ -1,24 +1,24 @@
 package ru.yandex.task_traker.model;
 
+import ru.yandex.task_traker.util.TaskType;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task {
     private List<Subtask> subtasks = new ArrayList<>();
 
-    @Override
-    public String toString() {
-        return "Epic{" +
-                "subtasks=" + subtasks +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", id=" + id +
-                ", status='" + status + '\'' +
-                '}';
-    }
-
     public Epic(String name, String description) {
         super(name, description);
+    }
+
+    private Epic(String id, String name, String description, String status) {
+        super(id, name, description, status);
+    }
+
+    public static Epic makeEpicFromString (String value) {
+        String[] splitValue = value.split(",");
+        return new Epic(splitValue[0], splitValue[2], splitValue[4], splitValue[3]);
     }
 
     public List<Subtask> getSubtasks() {
@@ -31,5 +31,10 @@ public class Epic extends Task {
 
     public void removeSubtasks(Subtask subtask) {
         this.subtasks.remove(subtask);
+    }
+
+    @Override
+    public String toString() {
+        return id + "," + TaskType.EPIC + "," + name + "," + status + "," + description;
     }
 }

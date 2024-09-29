@@ -61,6 +61,14 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     @Override
+    public void removeAllHistory() {
+        head = null;
+        tail = null;
+        size = 0;
+        viewedTask.clear();
+    }
+
+    @Override
     public void add(Task task) {
         if (size > 10) {
             removeNode(head);
@@ -103,7 +111,7 @@ public class InMemoryHistoryManager implements HistoryManager {
             return next;
         }
 
-        private void setNext(Node<E>next) {
+        private void setNext(Node<E> next) {
             this.next = next;
         }
 
@@ -111,7 +119,7 @@ public class InMemoryHistoryManager implements HistoryManager {
             return prev;
         }
 
-        private void setPrev(Node<E>prev) {
+        private void setPrev(Node<E> prev) {
             this.prev = prev;
         }
     }
