@@ -1,8 +1,5 @@
 package ru.yandex.task_traker.model;
 
-import ru.yandex.task_traker.util.TaskStatus;
-import ru.yandex.task_traker.util.TaskType;
-
 public class Task {
     protected String name;
     protected String description;
@@ -11,7 +8,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return id + "," + TaskType.TASK + "," + name + "," + status + "," + description;
+        return id + "," + TaskType.TASK + "," + name + "," + status + "," + description + "\n";
     }
 
     public Task(String name, String description) {

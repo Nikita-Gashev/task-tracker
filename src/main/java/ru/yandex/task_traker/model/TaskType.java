@@ -1,4 +1,4 @@
-package ru.yandex.task_traker.util;
+package ru.yandex.task_traker.model;
 
 public enum TaskType {
     TASK,

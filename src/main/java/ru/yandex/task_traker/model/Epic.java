@@ -1,12 +1,10 @@
 package ru.yandex.task_traker.model;
 
-import ru.yandex.task_traker.util.TaskType;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task {
-    private List<Subtask> subtasks = new ArrayList<>();
+    private final List<Subtask> subtasks = new ArrayList<>();
 
     public Epic(String name, String description) {
         super(name, description);
@@ -35,6 +33,6 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return id + "," + TaskType.EPIC + "," + name + "," + status + "," + description;
+        return id + "," + TaskType.EPIC + "," + name + "," + status + "," + description + "\n";
     }
 }

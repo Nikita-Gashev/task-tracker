@@ -1,7 +1,5 @@
 package ru.yandex.task_traker.model;
 
-import ru.yandex.task_traker.util.TaskType;
-
 public class Subtask extends Task {
     private int epicId;
 
@@ -26,6 +24,6 @@ public class Subtask extends Task {
 
     @Override
     public String toString() {
-        return id + "," + TaskType.SUBTASK + "," + name + "," + status + "," + description + "," + epicId;
+        return id + "," + TaskType.SUBTASK + "," + name + "," + status + "," + description + "," + epicId + "\n";
     }
 }

@@ -6,7 +6,7 @@ import ru.yandex.task_traker.model.Task;
 import ru.yandex.task_traker.service.HistoryManager;
 import ru.yandex.task_traker.service.TaskManager;
 import ru.yandex.task_traker.util.Managers;
-import ru.yandex.task_traker.util.TaskStatus;
+import ru.yandex.task_traker.model.TaskStatus;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -3,6 +3,7 @@ package ru.yandex.task_traker.util;
 import ru.yandex.task_traker.model.Epic;
 import ru.yandex.task_traker.model.Subtask;
 import ru.yandex.task_traker.model.Task;
+import ru.yandex.task_traker.model.TaskStatus;
 import ru.yandex.task_traker.service.TaskManager;
 import ru.yandex.task_traker.service.impl.FileBackedTasksManager;
 
