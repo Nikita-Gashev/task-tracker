@@ -1,7 +1,5 @@
 package ru.yandex.task_traker.model;
 
-import ru.yandex.task_traker.util.TaskStatus;
-
 public class Task {
     protected String name;
     protected String description;
@@ -10,17 +8,24 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", id=" + id +
-                ", status='" + status + '\'' +
-                '}';
+        return id + "," + TaskType.TASK + "," + name + "," + status + "," + description + "\n";
     }
 
     public Task(String name, String description) {
         this.name = name;
         this.description = description;
+    }
+
+    protected Task(String id, String name, String description, String status){
+        this.id = Integer.parseInt(id);
+        this.name = name;
+        this.description = description;
+        this.status = TaskStatus.valueOf(status);
+    }
+
+    public static Task makeTaskFromString (String value) {
+        String[] splitValue = value.split(",");
+        return new Task(splitValue[0], splitValue[2], splitValue[4], splitValue[3]);
     }
 
     public int getId() {

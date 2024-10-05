@@ -6,7 +6,7 @@ import ru.yandex.task_traker.model.Task;
 import ru.yandex.task_traker.service.HistoryManager;
 import ru.yandex.task_traker.service.TaskManager;
 import ru.yandex.task_traker.util.Managers;
-import ru.yandex.task_traker.util.TaskStatus;
+import ru.yandex.task_traker.model.TaskStatus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,11 +14,11 @@ import java.util.List;
 import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
-    private final Map<Integer, Task> tasks = new HashMap<>();
-    private final Map<Integer, Subtask> subtasks = new HashMap<>();
-    private final Map<Integer, Epic> epics = new HashMap<>();
+    protected static final Map<Integer, Task> tasks = new HashMap<>();
+    protected static final Map<Integer, Subtask> subtasks = new HashMap<>();
+    protected static final Map<Integer, Epic> epics = new HashMap<>();
     private int id = 0;
-    private final HistoryManager historyManager = Managers.getDefaultHistory();
+    protected static final HistoryManager historyManager = Managers.getDefaultHistory();
 
     @Override
     public List<Task> getTasksList() {
@@ -101,7 +101,8 @@ public class InMemoryTaskManager implements TaskManager {
         id++;
         subtask.setId(id);
         subtasks.put(id, subtask);
-        subtask.getEpic().setSubtasks(subtask);
+        getEpicById(subtask.getEpicId()).setSubtasks(subtask);
+        historyManager.remove(subtask.getEpicId());
     }
 
     @Override
@@ -119,7 +120,8 @@ public class InMemoryTaskManager implements TaskManager {
             throw new IllegalArgumentException("Введено некорретное значение индентификатора");
         } else {
             Subtask subtask = subtasks.get(id);
-            subtask.getEpic().removeSubtasks(subtask);
+            getEpicById(subtask.getEpicId()).removeSubtasks(subtask);
+            historyManager.remove(subtask.getEpicId());
             assignStatusForEpic(subtask);
         }
         subtasks.remove(id);
@@ -196,23 +198,24 @@ public class InMemoryTaskManager implements TaskManager {
         boolean epicDone = false;
         boolean epicNew = false;
 
-        for (Subtask subtaskForChecking : subtask.getEpic().getSubtasks()) {
+        for (Subtask subtaskForChecking : getEpicById(subtask.getEpicId()).getSubtasks()) {
             if (subtaskForChecking.getStatus().equals(TaskStatus.DONE)) {
                 epicDone = true;
             } else if (subtaskForChecking.getStatus().equals(TaskStatus.NEW)) {
                 epicNew = true;
             } else {
-                subtask.getEpic().setStatus(TaskStatus.IN_PROGRESS);
+                getEpicById(subtask.getEpicId()).setStatus(TaskStatus.IN_PROGRESS);
                 break;
             }
         }
 
         if (epicDone & !epicNew) {
-            subtask.getEpic().setStatus(TaskStatus.DONE);
+            getEpicById(subtask.getEpicId()).setStatus(TaskStatus.DONE);
         } else if (!epicDone & epicNew) {
-            subtask.getEpic().setStatus(TaskStatus.NEW);
+            getEpicById(subtask.getEpicId()).setStatus(TaskStatus.NEW);
         } else {
-            subtask.getEpic().setStatus(TaskStatus.IN_PROGRESS);
+            getEpicById(subtask.getEpicId()).setStatus(TaskStatus.IN_PROGRESS);
         }
+        historyManager.remove(subtask.getEpicId());
     }
 }
