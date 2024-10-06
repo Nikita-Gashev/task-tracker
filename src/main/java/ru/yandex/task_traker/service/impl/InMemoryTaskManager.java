@@ -1,17 +1,13 @@
 package ru.yandex.task_traker.service.impl;
 
-import ru.yandex.task_traker.model.Epic;
-import ru.yandex.task_traker.model.Subtask;
-import ru.yandex.task_traker.model.Task;
+import ru.yandex.task_traker.model.*;
 import ru.yandex.task_traker.service.HistoryManager;
 import ru.yandex.task_traker.service.TaskManager;
+import ru.yandex.task_traker.util.EmptyListException;
 import ru.yandex.task_traker.util.Managers;
-import ru.yandex.task_traker.model.TaskStatus;
+import ru.yandex.task_traker.util.TimeCrossingException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
     protected static final Map<Integer, Task> tasks = new HashMap<>();
@@ -19,6 +15,33 @@ public class InMemoryTaskManager implements TaskManager {
     protected static final Map<Integer, Epic> epics = new HashMap<>();
     private int id = 0;
     protected static final HistoryManager historyManager = Managers.getDefaultHistory();
+
+    private void checkTimeCrossing(Task task) throws TimeCrossingException, EmptyListException {
+        for (Task taskFromList : getPrioritizedTasks()) {
+            if (task.getStartTime().isEqual(taskFromList.getStartTime())
+                    || task.getStartTime().isBefore(taskFromList.getStartTime())
+                    && task.getEndTime().isAfter(taskFromList.getStartTime())
+                    || task.getStartTime().isAfter(taskFromList.getStartTime())
+                    && task.getStartTime().isBefore(taskFromList.getEndTime())) {
+                throw new TimeCrossingException("Время выполнения задачи пересекается");
+            }
+        }
+    }
+
+    @Override
+    public TreeSet<Task> getPrioritizedTasks() throws EmptyListException {
+        TreeSet<Task> prioritizedTasksList = new TreeSet<>(new TaskComparator());
+        if (!tasks.isEmpty()) {
+            prioritizedTasksList.addAll(getTasksList());
+        }
+        if (!subtasks.isEmpty()) {
+            prioritizedTasksList.addAll(getSubtaskList());
+        }
+        if (tasks.isEmpty() && subtasks.isEmpty()) {
+            throw new EmptyListException("Список задач и подзадач пуст");
+        }
+        return prioritizedTasksList;
+    }
 
     @Override
     public List<Task> getTasksList() {
@@ -45,17 +68,37 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void createTask(Task task) {
-        id++;
-        task.setId(id);
-        tasks.put(id, task);
+        if (tasks.isEmpty() && subtasks.isEmpty()) {
+            id++;
+            task.setId(id);
+            tasks.put(id, task);
+        } else {
+            try {
+                checkTimeCrossing(task);
+                id++;
+                task.setId(id);
+                tasks.put(id, task);
+            } catch (TimeCrossingException | EmptyListException e) {
+                System.out.println(e.getMessage());
+            }
+        }
     }
 
     @Override
     public void updateTask(Task task) {
-        if (!(tasks.containsValue(task))) {
+        if (!(tasks.containsKey(task.getId()))) {
             throw new IllegalArgumentException("Задача отсутствует в списке");
-        } else {
+        }
+        tasks.remove(task.getId());
+        if (tasks.isEmpty() && subtasks.isEmpty()) {
             tasks.put(task.getId(), task);
+        } else {
+            try {
+                checkTimeCrossing(task);
+                tasks.put(task.getId(), task);
+            } catch (TimeCrossingException | EmptyListException e) {
+                System.out.println(e.getMessage());
+            }
         }
     }
 
@@ -98,11 +141,27 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void createSubtask(Subtask subtask) {
-        id++;
-        subtask.setId(id);
-        subtasks.put(id, subtask);
-        getEpicById(subtask.getEpicId()).setSubtasks(subtask);
-        historyManager.remove(subtask.getEpicId());
+        if (tasks.isEmpty() && subtasks.isEmpty()) {
+            id++;
+            subtask.setId(id);
+            subtasks.put(id, subtask);
+            epics.get(subtask.getEpicId()).setSubtasks(subtask);
+            epics.get(subtask.getEpicId()).assignStatus();
+            epics.get(subtask.getEpicId()).updateTimeAndDuration();
+        } else {
+            try {
+                checkTimeCrossing(subtask);
+                id++;
+                subtask.setId(id);
+                subtasks.put(id, subtask);
+                epics.get(subtask.getEpicId()).setSubtasks(subtask);
+                epics.get(subtask.getEpicId()).assignStatus();
+                epics.get(subtask.getEpicId()).updateTimeAndDuration();
+            } catch (TimeCrossingException | EmptyListException e) {
+                System.out.println(e.getMessage());
+            }
+
+        }
     }
 
     @Override
@@ -110,8 +169,19 @@ public class InMemoryTaskManager implements TaskManager {
         if (!subtasks.containsKey(subtask.getId())) {
             throw new IllegalArgumentException("Подзадача отсутствует в списке");
         }
-        subtasks.put(subtask.getId(), subtask);
-        assignStatusForEpic(subtask);
+        subtasks.remove(subtask.getId());
+        if (tasks.isEmpty() && subtasks.isEmpty()) {
+            subtasks.put(subtask.getId(), subtask);
+        } else {
+            try {
+                checkTimeCrossing(subtask);
+                subtasks.put(subtask.getId(), subtask);
+                epics.get(subtask.getEpicId()).assignStatus();
+                epics.get(subtask.getEpicId()).updateTimeAndDuration();
+            } catch (TimeCrossingException | EmptyListException e) {
+                System.out.println(e.getMessage());
+            }
+        }
     }
 
     @Override
@@ -120,9 +190,9 @@ public class InMemoryTaskManager implements TaskManager {
             throw new IllegalArgumentException("Введено некорретное значение индентификатора");
         } else {
             Subtask subtask = subtasks.get(id);
-            getEpicById(subtask.getEpicId()).removeSubtasks(subtask);
-            historyManager.remove(subtask.getEpicId());
-            assignStatusForEpic(subtask);
+            epics.get(subtask.getEpicId()).removeSubtasks(subtask);
+            epics.get(subtask.getEpicId()).assignStatus();
+            epics.get(subtask.getEpicId()).updateTimeAndDuration();
         }
         subtasks.remove(id);
         historyManager.remove(id);
@@ -161,7 +231,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateEpic(Epic epic) {
-        if (!(epics.containsValue(epic))) {
+        if (!(epics.containsKey(epic.getId()))) {
             throw new IllegalArgumentException("Епик отсутствует в списке");
         } else {
             epics.put(epic.getId(), epic);
@@ -191,31 +261,5 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<Task> getHistory() {
         return historyManager.getHistory();
-    }
-
-    private void assignStatusForEpic(Subtask subtask) {
-
-        boolean epicDone = false;
-        boolean epicNew = false;
-
-        for (Subtask subtaskForChecking : getEpicById(subtask.getEpicId()).getSubtasks()) {
-            if (subtaskForChecking.getStatus().equals(TaskStatus.DONE)) {
-                epicDone = true;
-            } else if (subtaskForChecking.getStatus().equals(TaskStatus.NEW)) {
-                epicNew = true;
-            } else {
-                getEpicById(subtask.getEpicId()).setStatus(TaskStatus.IN_PROGRESS);
-                break;
-            }
-        }
-
-        if (epicDone & !epicNew) {
-            getEpicById(subtask.getEpicId()).setStatus(TaskStatus.DONE);
-        } else if (!epicDone & epicNew) {
-            getEpicById(subtask.getEpicId()).setStatus(TaskStatus.NEW);
-        } else {
-            getEpicById(subtask.getEpicId()).setStatus(TaskStatus.IN_PROGRESS);
-        }
-        historyManager.remove(subtask.getEpicId());
     }
 }

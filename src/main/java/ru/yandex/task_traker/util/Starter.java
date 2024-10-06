@@ -16,23 +16,29 @@ public class Starter {
     TaskManager managerFileBack = Managers.getFileBackedTasksManager(fileForSaving);
 
     // id1
-    final Task task1 = new Task("Задча 1", "Описание задачи 1");
+    final Task task1 = new Task("Задча 1", "Описание задачи 1", "16-10-2024 12:00",
+            120);
     // id2
-    final Task task2 = new Task("Задча 2", "Описание задачи 2");
+    final Task task2 = new Task("Задча 2", "Описание задачи 2", "17-10-2024 13:00",
+            150);
     // id3
     final Epic epic1 = new Epic("Епик 1", "Описание епик 1");
     // id4
     final Epic epic2 = new Epic("Епик 2", "Описание епик 2");
     // id5
-    final Subtask subtask1 = new Subtask("Подзадача 1", "Подзадача 1 епика 1", 3);
+    final Subtask subtask1 = new Subtask("Подзадача 1", "Подзадача 1 епика 1", 3,
+            "18-10-2024 12:00", 170);
     // id6
-    final Subtask subtask2 = new Subtask("Подзадача 2", "Подзадача 2 епика 1", 3);
+    final Subtask subtask2 = new Subtask("Подзадача 2", "Подзадача 2 епика 1", 3,
+            "19-10-2024 12:00", 200);
     // id7
-    final Subtask subtask3 = new Subtask("Подзадача 3", "Подзадача 3 епика 2", 4);
+    final Subtask subtask3 = new Subtask("Подзадача 3", "Подзадача 3 епика 2", 4,
+            "20-10-2024 12:00", 100);
     // id8
-    final Subtask subtask4 = new Subtask("Подзадача 4", "Подзадача 4 епика 1", 3);
+    final Subtask subtask4 = new Subtask("Подзадача 4", "Подзадача 4 епика 1", 3,
+            "15-10-2024 12:00", 60);
 
-    public void test1() {
+    public void test1() throws EmptyListException {
         manager.createTask(task1);
         manager.createTask(task2);
         manager.createEpic(epic1);
@@ -41,6 +47,8 @@ public class Starter {
         manager.createSubtask(subtask2);
         manager.createSubtask(subtask3);
         manager.createSubtask(subtask4);
+
+        System.out.println(manager.getPrioritizedTasks());
 
         System.out.println(manager.getTasksList());
         System.out.println(manager.getEpicList());
@@ -93,10 +101,20 @@ public class Starter {
         managerFileBack.getTaskById(2);
         managerFileBack.getSubtaskById(5);
 
+        subtask1.setStatus(TaskStatus.IN_PROGRESS);
+        managerFileBack.updateSubtask(subtask1);
+
         TaskManager managerFileBackAfterSaving = FileBackedTasksManager.loadFromFile(fileForSaving);
 
         System.out.println(managerFileBackAfterSaving.getHistory());
         System.out.println();
         System.out.println(managerFileBackAfterSaving.getTasksList());
+    }
+
+    public void test3() throws EmptyListException {
+        manager.createTask(task1);
+        manager.createTask(task2);
+        manager.createTask(subtask1);
+        System.out.println(manager.getPrioritizedTasks());
     }
 }
