@@ -8,7 +8,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return id + "," + TaskType.TASK + "," + name + "," + status + "," + description + "\n";
+        return id + "," + TaskType.TASK + "," + name + "," + status + "," + description;
     }
 
     public Task(String name, String description) {

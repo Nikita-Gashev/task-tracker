@@ -102,6 +102,7 @@ public class InMemoryTaskManager implements TaskManager {
         subtask.setId(id);
         subtasks.put(id, subtask);
         getEpicById(subtask.getEpicId()).setSubtasks(subtask);
+        getEpicById(subtask.getEpicId()).assignStatus();
         historyManager.remove(subtask.getEpicId());
     }
 
@@ -111,7 +112,8 @@ public class InMemoryTaskManager implements TaskManager {
             throw new IllegalArgumentException("Подзадача отсутствует в списке");
         }
         subtasks.put(subtask.getId(), subtask);
-        assignStatusForEpic(subtask);
+        getEpicById(subtask.getEpicId()).assignStatus();
+        historyManager.remove(subtask.getEpicId());
     }
 
     @Override
@@ -121,8 +123,8 @@ public class InMemoryTaskManager implements TaskManager {
         } else {
             Subtask subtask = subtasks.get(id);
             getEpicById(subtask.getEpicId()).removeSubtasks(subtask);
+            getEpicById(subtask.getEpicId()).assignStatus();
             historyManager.remove(subtask.getEpicId());
-            assignStatusForEpic(subtask);
         }
         subtasks.remove(id);
         historyManager.remove(id);
@@ -191,31 +193,5 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<Task> getHistory() {
         return historyManager.getHistory();
-    }
-
-    private void assignStatusForEpic(Subtask subtask) {
-
-        boolean epicDone = false;
-        boolean epicNew = false;
-
-        for (Subtask subtaskForChecking : getEpicById(subtask.getEpicId()).getSubtasks()) {
-            if (subtaskForChecking.getStatus().equals(TaskStatus.DONE)) {
-                epicDone = true;
-            } else if (subtaskForChecking.getStatus().equals(TaskStatus.NEW)) {
-                epicNew = true;
-            } else {
-                getEpicById(subtask.getEpicId()).setStatus(TaskStatus.IN_PROGRESS);
-                break;
-            }
-        }
-
-        if (epicDone & !epicNew) {
-            getEpicById(subtask.getEpicId()).setStatus(TaskStatus.DONE);
-        } else if (!epicDone & epicNew) {
-            getEpicById(subtask.getEpicId()).setStatus(TaskStatus.NEW);
-        } else {
-            getEpicById(subtask.getEpicId()).setStatus(TaskStatus.IN_PROGRESS);
-        }
-        historyManager.remove(subtask.getEpicId());
     }
 }

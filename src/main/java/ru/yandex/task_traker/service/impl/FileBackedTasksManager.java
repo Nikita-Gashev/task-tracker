@@ -21,13 +21,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         try (Writer writer = new FileWriter(fileForSaving)) {
             writer.write(HEAD_OF_SAVING_LIST);
             for (Task task : super.getTasksList()) {
-                writer.write(task.toString());
+                writer.write(task.toString() + "\n");
             }
             for (Task epic : super.getEpicList()) {
-                writer.write(epic.toString());
+                writer.write(epic.toString() + "\n");
             }
             for (Task subtask : super.getSubtaskList()) {
-                writer.write(subtask.toString());
+                writer.write(subtask.toString() + "\n");
             }
             writer.write("\n");
             for (Task task : super.getHistory()) {
