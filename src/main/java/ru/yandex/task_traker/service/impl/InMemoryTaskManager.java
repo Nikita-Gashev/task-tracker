@@ -103,6 +103,7 @@ public class InMemoryTaskManager implements TaskManager {
         subtasks.put(id, subtask);
         getEpicById(subtask.getEpicId()).setSubtasks(subtask);
         getEpicById(subtask.getEpicId()).assignStatus();
+        getEpicById(subtask.getEpicId()).updateTimeAndDuration();
         historyManager.remove(subtask.getEpicId());
     }
 
@@ -113,6 +114,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
         subtasks.put(subtask.getId(), subtask);
         getEpicById(subtask.getEpicId()).assignStatus();
+        getEpicById(subtask.getEpicId()).updateTimeAndDuration();
         historyManager.remove(subtask.getEpicId());
     }
 
@@ -124,6 +126,7 @@ public class InMemoryTaskManager implements TaskManager {
             Subtask subtask = subtasks.get(id);
             getEpicById(subtask.getEpicId()).removeSubtasks(subtask);
             getEpicById(subtask.getEpicId()).assignStatus();
+            getEpicById(subtask.getEpicId()).updateTimeAndDuration();
             historyManager.remove(subtask.getEpicId());
         }
         subtasks.remove(id);

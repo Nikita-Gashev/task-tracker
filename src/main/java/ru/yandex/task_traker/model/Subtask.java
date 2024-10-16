@@ -3,8 +3,8 @@ package ru.yandex.task_traker.model;
 public class Subtask extends Task {
     private int epicId;
 
-    public Subtask(String name, String description, int epicId) {
-        super(name, description);
+    public Subtask(String name, String description, int epicId, String startTime, int duration) {
+        super(name, description, startTime, duration);
         this.epicId = epicId;
     }
 
@@ -13,9 +13,9 @@ public class Subtask extends Task {
         this.epicId = Integer.parseInt(epicId);
     }
 
-    public static Subtask makeSubtaskFromString (String value) {
+    public static Subtask makeSubtaskFromString(String value) {
         String[] splitValue = value.split(",");
-        return new Subtask(splitValue[0], splitValue[2], splitValue[4], splitValue[3],splitValue[5]);
+        return new Subtask(splitValue[0], splitValue[2], splitValue[4], splitValue[3], splitValue[5]);
     }
 
     public int getEpicId() {
@@ -24,6 +24,7 @@ public class Subtask extends Task {
 
     @Override
     public String toString() {
-        return id + "," + TaskType.SUBTASK + "," + name + "," + status + "," + description + "," + epicId;
+        return id + "," + TaskType.SUBTASK + "," + name + "," + status + "," + description + "," + epicId + ","
+                + duration.toMinutes() + "," + startTime.format(formatter);
     }
 }

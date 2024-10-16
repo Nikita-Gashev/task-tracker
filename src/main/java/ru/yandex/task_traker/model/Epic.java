@@ -1,10 +1,13 @@
 package ru.yandex.task_traker.model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task {
     private final List<Subtask> subtasks = new ArrayList<>();
+    private LocalDateTime endTime;
 
     public Epic(String name, String description) {
         super(name, description);
@@ -14,7 +17,7 @@ public class Epic extends Task {
         super(id, name, description, status);
     }
 
-    public static Epic makeEpicFromString (String value) {
+    public static Epic makeEpicFromString(String value) {
         String[] splitValue = value.split(",");
         return new Epic(splitValue[0], splitValue[2], splitValue[4], splitValue[3]);
     }
@@ -60,8 +63,41 @@ public class Epic extends Task {
 
     }
 
+    private void updateStartTime() {
+        for (Subtask subtask : subtasks) {
+            if (startTime == null) {
+                startTime = subtask.getStartTime();
+            } else if (subtask.getStartTime().isBefore(startTime)) {
+                startTime = subtask.getStartTime();
+            }
+        }
+    }
+
+    private void updateEndTime() {
+        for (Subtask subtask : subtasks) {
+            if (endTime == null) {
+                endTime = subtask.getEndTime();
+            } else if (subtask.getEndTime().isAfter(endTime)) {
+                endTime = subtask.getEndTime();
+            }
+        }
+    }
+
+    private void updateDuration() {
+        if (startTime != null && endTime != null) {
+            duration = Duration.between(startTime, endTime);
+        }
+    }
+
+    public void updateTimeAndDuration() {
+        updateStartTime();
+        updateEndTime();
+        updateDuration();
+    }
+
     @Override
     public String toString() {
-        return id + "," + TaskType.EPIC + "," + name + "," + status + "," + description;
+        return id + "," + TaskType.EPIC + "," + name + "," + status + "," + description + "," + duration.toMinutes()
+                + "," + startTime.format(formatter);
     }
 }
