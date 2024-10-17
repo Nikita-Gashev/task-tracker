@@ -64,13 +64,19 @@ public class Epic extends Task {
     }
 
     private void updateStartTime() {
+        /* startTime = subtasks.get(0).getStartTime();
         for (Subtask subtask : subtasks) {
-            if (startTime == null) {
-                startTime = subtask.getStartTime();
-            } else if (subtask.getStartTime().isBefore(startTime)) {
+             if (subtask.getStartTime().isBefore(startTime)) {
                 startTime = subtask.getStartTime();
             }
-        }
+        } */
+
+        startTime = subtasks.get(0).getStartTime();
+        subtasks.forEach(subtask -> {
+            if (subtask.getStartTime().isBefore(startTime)) {
+                startTime = subtask.getStartTime();
+            }
+        });
     }
 
     private void updateEndTime() {
