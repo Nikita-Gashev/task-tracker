@@ -99,6 +99,9 @@ public class Starter {
         managerFileBack.getTaskById(2);
         managerFileBack.getSubtaskById(5);
 
+        subtask1.setStatus(TaskStatus.IN_PROGRESS);
+        managerFileBack.updateSubtask(subtask1);
+
         TaskManager managerFileBackAfterSaving = FileBackedTasksManager.loadFromFile(fileForSaving);
 
         System.out.println(managerFileBackAfterSaving.getHistory());

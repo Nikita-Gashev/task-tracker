@@ -38,9 +38,19 @@ public class Task {
         this.status = TaskStatus.valueOf(status);
     }
 
+    protected Task(String id, String name, String description, String status, String duration, String startTime) {
+        this.id = Integer.parseInt(id);
+        this.name = name;
+        this.description = description;
+        this.status = TaskStatus.valueOf(status);
+        this.startTime = LocalDateTime.parse(startTime, formatter);
+        this.duration = Duration.ofMinutes(Integer.parseInt(duration));
+
+    }
+
     public static Task makeTaskFromString(String value) {
         String[] splitValue = value.split(",");
-        return new Task(splitValue[0], splitValue[2], splitValue[4], splitValue[3]);
+        return new Task(splitValue[0], splitValue[2], splitValue[4], splitValue[3], splitValue[5], splitValue[6]);
     }
 
     public int getId() {

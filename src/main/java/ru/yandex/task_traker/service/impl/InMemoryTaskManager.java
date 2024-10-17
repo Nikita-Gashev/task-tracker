@@ -101,10 +101,9 @@ public class InMemoryTaskManager implements TaskManager {
         id++;
         subtask.setId(id);
         subtasks.put(id, subtask);
-        getEpicById(subtask.getEpicId()).setSubtasks(subtask);
-        getEpicById(subtask.getEpicId()).assignStatus();
-        getEpicById(subtask.getEpicId()).updateTimeAndDuration();
-        historyManager.remove(subtask.getEpicId());
+        getEpicByIdWithoutHistory(subtask.getEpicId()).setSubtasks(subtask);
+        getEpicByIdWithoutHistory(subtask.getEpicId()).assignStatus();
+        getEpicByIdWithoutHistory(subtask.getEpicId()).updateTimeAndDuration();
     }
 
     @Override
@@ -113,9 +112,8 @@ public class InMemoryTaskManager implements TaskManager {
             throw new IllegalArgumentException("Подзадача отсутствует в списке");
         }
         subtasks.put(subtask.getId(), subtask);
-        getEpicById(subtask.getEpicId()).assignStatus();
-        getEpicById(subtask.getEpicId()).updateTimeAndDuration();
-        historyManager.remove(subtask.getEpicId());
+        getEpicByIdWithoutHistory(subtask.getEpicId()).assignStatus();
+        getEpicByIdWithoutHistory(subtask.getEpicId()).updateTimeAndDuration();
     }
 
     @Override
@@ -124,10 +122,9 @@ public class InMemoryTaskManager implements TaskManager {
             throw new IllegalArgumentException("Введено некорретное значение индентификатора");
         } else {
             Subtask subtask = subtasks.get(id);
-            getEpicById(subtask.getEpicId()).removeSubtasks(subtask);
-            getEpicById(subtask.getEpicId()).assignStatus();
-            getEpicById(subtask.getEpicId()).updateTimeAndDuration();
-            historyManager.remove(subtask.getEpicId());
+            getEpicByIdWithoutHistory(subtask.getEpicId()).removeSubtasks(subtask);
+            getEpicByIdWithoutHistory(subtask.getEpicId()).assignStatus();
+            getEpicByIdWithoutHistory(subtask.getEpicId()).updateTimeAndDuration();
         }
         subtasks.remove(id);
         historyManager.remove(id);
@@ -153,6 +150,14 @@ public class InMemoryTaskManager implements TaskManager {
             throw new IllegalArgumentException("Введено некорретное значение индентификатора");
         } else {
             historyManager.add(epics.get(id));
+            return epics.get(id);
+        }
+    }
+
+    private Epic getEpicByIdWithoutHistory(int id) {
+        if (epics.get(id) == null) {
+            throw new IllegalArgumentException("Введено некорретное значение индентификатора");
+        } else {
             return epics.get(id);
         }
     }

@@ -97,7 +97,11 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return id + "," + TaskType.EPIC + "," + name + "," + status + "," + description + "," + duration.toMinutes()
-                + "," + startTime.format(formatter);
+        if (duration == null || startTime == null) {
+            return id + "," + TaskType.EPIC + "," + name + "," + status + "," + description;
+        } else {
+            return id + "," + TaskType.EPIC + "," + name + "," + status + "," + description + "," + duration.toMinutes()
+                    + "," + startTime.format(formatter);
+        }
     }
 }
