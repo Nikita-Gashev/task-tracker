@@ -38,7 +38,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-    private static List<String> readTaskFromFile(File file) throws IOException {
+    private List<String> readTaskFromFile(File file) throws IOException {
         List<String> lines = new ArrayList<>();
         try (FileReader reader = new FileReader(file)) {
             BufferedReader br = new BufferedReader(reader);
@@ -54,7 +54,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return lines;
     }
 
-    private static void makeTasksFromString(String value) {
+    private void makeTasksFromString(String value) {
         Task task;
         switch (value.split(",")[1]) {
             case "TASK":
@@ -75,7 +75,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-    private static List<Integer> readHistoryFromFile(File file) throws IOException {
+    private List<Integer> readHistoryFromFile(File file) throws IOException {
         List<Integer> idTaskInHistory = new ArrayList<>();
         try (FileReader reader = new FileReader(file)) {
             BufferedReader br = new BufferedReader(reader);
@@ -96,16 +96,15 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return idTaskInHistory;
     }
 
-    public static FileBackedTasksManager loadFromFile(File file) throws IOException {
-        FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager(file);
+    public void loadFromFile() throws IOException {
         tasks.clear();
         epics.clear();
         subtasks.clear();
-        for (String str : readTaskFromFile(file)) {
+        for (String str : readTaskFromFile(fileForSaving)) {
             makeTasksFromString(str);
         }
         historyManager.removeAllHistory();
-        for (Integer id : readHistoryFromFile(file)) {
+        for (Integer id : readHistoryFromFile(fileForSaving)) {
             if (tasks.containsKey(id)) {
                 historyManager.add(tasks.get(id));
             } else if (epics.containsKey(id)) {
@@ -114,7 +113,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 historyManager.add(subtasks.get(id));
             }
         }
-        return fileBackedTasksManager;
     }
 
     @Override

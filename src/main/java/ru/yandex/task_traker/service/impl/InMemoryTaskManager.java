@@ -3,34 +3,36 @@ package ru.yandex.task_traker.service.impl;
 import ru.yandex.task_traker.model.*;
 import ru.yandex.task_traker.service.HistoryManager;
 import ru.yandex.task_traker.service.TaskManager;
-import ru.yandex.task_traker.util.EmptyListException;
 import ru.yandex.task_traker.util.Managers;
 import ru.yandex.task_traker.util.TimeCrossingException;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
-    protected static final Map<Integer, Task> tasks = new HashMap<>();
-    protected static final Map<Integer, Subtask> subtasks = new HashMap<>();
-    protected static final Map<Integer, Epic> epics = new HashMap<>();
+    protected final Map<Integer, Task> tasks = new HashMap<>();
+    protected final Map<Integer, Subtask> subtasks = new HashMap<>();
+    protected final Map<Integer, Epic> epics = new HashMap<>();
     private int id = 0;
     protected static final HistoryManager historyManager = Managers.getDefaultHistory();
 
-    private void checkTimeCrossing(Task task) throws TimeCrossingException, EmptyListException {
+    private void checkTimeCrossing(Task task) throws TimeCrossingException {
         for (Task taskFromList : getPrioritizedTasks()) {
-            if (task.getStartTime().isEqual(taskFromList.getStartTime())
-                    || task.getStartTime().isBefore(taskFromList.getStartTime())
-                    && task.getEndTime().isAfter(taskFromList.getStartTime())
-                    || task.getStartTime().isAfter(taskFromList.getStartTime())
-                    && task.getStartTime().isBefore(taskFromList.getEndTime())) {
+            LocalDateTime taskStart = task.getStartTime();
+            LocalDateTime taskFromListStart = taskFromList.getStartTime();
+            boolean timeCrossing1 = taskStart.isBefore(taskFromListStart)
+                    && task.getEndTime().isAfter(taskFromListStart);
+            boolean timeCrossing2 = taskStart.isAfter(taskFromListStart)
+                    && taskStart.isBefore(taskFromList.getEndTime());
+            if (taskStart.isEqual(taskFromListStart) || timeCrossing1 || timeCrossing2) {
                 throw new TimeCrossingException("Время выполнения задачи пересекается");
             }
         }
     }
 
     @Override
-    public TreeSet<Task> getPrioritizedTasks() throws EmptyListException {
-        TreeSet<Task> prioritizedTasksList = new TreeSet<>(new TaskComparator());
+    public SortedSet<Task> getPrioritizedTasks() {
+        SortedSet<Task> prioritizedTasksList = new TreeSet<>();
         if (!tasks.isEmpty()) {
             prioritizedTasksList.addAll(getTasksList());
         }
@@ -38,7 +40,7 @@ public class InMemoryTaskManager implements TaskManager {
             prioritizedTasksList.addAll(getSubtaskList());
         }
         if (tasks.isEmpty() && subtasks.isEmpty()) {
-            throw new EmptyListException("Список задач и подзадач пуст");
+            prioritizedTasksList = Collections.emptySortedSet();
         }
         return prioritizedTasksList;
     }
@@ -78,7 +80,7 @@ public class InMemoryTaskManager implements TaskManager {
                 id++;
                 task.setId(id);
                 tasks.put(id, task);
-            } catch (TimeCrossingException | EmptyListException e) {
+            } catch (TimeCrossingException e) {
                 System.out.println(e.getMessage());
             }
         }
@@ -96,7 +98,7 @@ public class InMemoryTaskManager implements TaskManager {
             try {
                 checkTimeCrossing(task);
                 tasks.put(task.getId(), task);
-            } catch (TimeCrossingException | EmptyListException e) {
+            } catch (TimeCrossingException e) {
                 System.out.println(e.getMessage());
             }
         }
@@ -157,7 +159,7 @@ public class InMemoryTaskManager implements TaskManager {
                 epics.get(subtask.getEpicId()).setSubtasks(subtask);
                 epics.get(subtask.getEpicId()).assignStatus();
                 epics.get(subtask.getEpicId()).updateTimeAndDuration();
-            } catch (TimeCrossingException | EmptyListException e) {
+            } catch (TimeCrossingException e) {
                 System.out.println(e.getMessage());
             }
 
@@ -178,7 +180,7 @@ public class InMemoryTaskManager implements TaskManager {
                 subtasks.put(subtask.getId(), subtask);
                 epics.get(subtask.getEpicId()).assignStatus();
                 epics.get(subtask.getEpicId()).updateTimeAndDuration();
-            } catch (TimeCrossingException | EmptyListException e) {
+            } catch (TimeCrossingException e) {
                 System.out.println(e.getMessage());
             }
         }

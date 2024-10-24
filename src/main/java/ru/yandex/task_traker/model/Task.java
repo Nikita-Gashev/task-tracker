@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
-public class Task {
+public class Task implements Comparable<Task> {
     protected String name;
     protected String description;
     protected int id;
@@ -86,8 +86,14 @@ public class Task {
 
     @Override
     public String toString() {
-        return id + "," + TaskType.TASK + "," + name + "," + status + "," + description + "," + duration.toMinutes()
-                + "," + startTime.format(formatter);
+        return String.format("%d,%s,%s,%s,%s,%s,%s",
+                id,
+                TaskType.TASK,
+                name,
+                status,
+                description,
+                duration.toMinutes(),
+                startTime.format(formatter));
     }
 
     @Override
@@ -107,5 +113,16 @@ public class Task {
     @Override
     public int hashCode() {
         return super.hashCode();
+    }
+
+    @Override
+    public int compareTo(Task task) {
+        if (this.startTime.isEqual(task.getStartTime())) {
+            return 0;
+        } else if (this.startTime.isBefore(task.getStartTime())) {
+            return -1;
+        } else {
+            return 1;
+        }
     }
 }

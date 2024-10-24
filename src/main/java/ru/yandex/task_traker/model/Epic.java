@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Epic extends Task {
     private final List<Subtask> subtasks = new ArrayList<>();
@@ -109,12 +110,14 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        if (duration == null || startTime == null) {
-            return id + "," + TaskType.EPIC + "," + name + "," + status + "," + description;
-        } else {
-            return id + "," + TaskType.EPIC + "," + name + "," + status + "," + description + "," + duration.toMinutes()
-                    + "," + startTime.format(formatter);
-        }
+        return String.format("%d,%s,%s,%s,%s,%s,%s",
+                id,
+                TaskType.EPIC,
+                name,
+                status,
+                description,
+                Objects.nonNull(duration) ? duration.toMinutes() : "",
+                Objects.nonNull(startTime) ? startTime.format(formatter) : "");
     }
 
     @Override

@@ -13,7 +13,7 @@ import java.io.IOException;
 public class Starter {
     File fileForSaving = new File("D:\\Никита\\Программирование\\dev\\task-tracker", "fileForSaving.csv");
     TaskManager manager = Managers.getInMemoryTaskManager();
-    TaskManager managerFileBack = Managers.getFileBackedTasksManager(fileForSaving);
+    FileBackedTasksManager managerFileBack = Managers.getFileBackedTasksManager(fileForSaving);
 
     // id1
     final Task task1 = new Task("Задча 1", "Описание задачи 1", "16-10-2024 12:00",
@@ -38,7 +38,7 @@ public class Starter {
     final Subtask subtask4 = new Subtask("Подзадача 4", "Подзадача 4 епика 1", 3,
             "15-10-2024 12:00", 60);
 
-    public void test1() throws EmptyListException {
+    public void test1() {
         manager.createTask(task1);
         manager.createTask(task2);
         manager.createEpic(epic1);
@@ -104,14 +104,15 @@ public class Starter {
         subtask1.setStatus(TaskStatus.IN_PROGRESS);
         managerFileBack.updateSubtask(subtask1);
 
-        TaskManager managerFileBackAfterSaving = FileBackedTasksManager.loadFromFile(fileForSaving);
+        FileBackedTasksManager managerFileBackAfterSaving = Managers.getFileBackedTasksManager(fileForSaving);
+        managerFileBackAfterSaving.loadFromFile();
 
         System.out.println(managerFileBackAfterSaving.getHistory());
         System.out.println();
         System.out.println(managerFileBackAfterSaving.getTasksList());
     }
 
-    public void test3() throws EmptyListException {
+    public void test3() {
         manager.createTask(task1);
         manager.createTask(task2);
         manager.createTask(subtask1);

@@ -1,9 +1,12 @@
 package ru.yandex.task_traker.service.impl;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.yandex.task_traker.model.Epic;
 import ru.yandex.task_traker.model.Subtask;
 import ru.yandex.task_traker.model.Task;
+import ru.yandex.task_traker.service.TaskManager;
+import ru.yandex.task_traker.util.Managers;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,61 +27,75 @@ public class FileBackedTasksManagerTest {
             "21-10-2024 12:00", 120);
 
     @Test
-    void shouldSaveAndLoadTask() throws IOException {
+    @DisplayName("Создание и загрузка задачи")
+    void saveAndLoadTask() throws IOException {
         manager.createTask(task1);
-        FileBackedTasksManager managerAfterLoading = FileBackedTasksManager.loadFromFile(fileForSaving);
+        FileBackedTasksManager managerAfterLoading = Managers.getFileBackedTasksManager(fileForSaving);
+        managerAfterLoading.loadFromFile();
         assertEquals(task1, managerAfterLoading.getTaskById(1), "Задачи не совпадают");
     }
 
     @Test
-    void shouldLoadEmptyTaskList() throws IOException {
+    @DisplayName("Удаление задачи и загрузка пустого файла")
+    void loadEmptyTaskList() throws IOException {
         manager.createTask(task1);
         manager.removeTask(1);
-        FileBackedTasksManager managerAfterLoading = FileBackedTasksManager.loadFromFile(fileForSaving);
+        FileBackedTasksManager managerAfterLoading = Managers.getFileBackedTasksManager(fileForSaving);
+        managerAfterLoading.loadFromFile();
         assertEquals(0, managerAfterLoading.getTasksList().size(), "В списке есть задачи");
     }
 
     @Test
-    void shouldSaveAndLoadEpic() throws IOException {
+    @DisplayName("Создание и загрузка эпика")
+    void saveAndLoadEpic() throws IOException {
         manager.createEpic(epic1);
-        FileBackedTasksManager managerAfterLoading = FileBackedTasksManager.loadFromFile(fileForSaving);
+        FileBackedTasksManager managerAfterLoading = Managers.getFileBackedTasksManager(fileForSaving);
+        managerAfterLoading.loadFromFile();
         assertEquals(epic1, managerAfterLoading.getEpicById(1), "Епики не совпадают");
     }
 
     @Test
-    void shouldLoadEmptyEpicList() throws IOException {
+    @DisplayName("Удаление эпика и загрузка пустого файла")
+    void loadEmptyEpicList() throws IOException {
         manager.createEpic(epic1);
         manager.removeEpic(1);
-        FileBackedTasksManager managerAfterLoading = FileBackedTasksManager.loadFromFile(fileForSaving);
+        FileBackedTasksManager managerAfterLoading = Managers.getFileBackedTasksManager(fileForSaving);
+        managerAfterLoading.loadFromFile();
         assertEquals(0, managerAfterLoading.getEpicList().size(), "В списке есть эпики");
     }
 
     @Test
-    void shouldSaveAndLoadSubtask() throws IOException {
+    @DisplayName("Создание и загрузка подзадачи")
+    void saveAndLoadSubtask() throws IOException {
         manager.createEpic(epic1);
         manager.createSubtask(subtask1);
-        FileBackedTasksManager managerAfterLoading = FileBackedTasksManager.loadFromFile(fileForSaving);
+        FileBackedTasksManager managerAfterLoading = Managers.getFileBackedTasksManager(fileForSaving);
+        managerAfterLoading.loadFromFile();
         assertEquals(subtask1, managerAfterLoading.getSubtaskById(2), "Подзадачи не совпадают");
     }
 
     @Test
-    void shouldLoadEmptySubtaskList() throws IOException {
+    @DisplayName("Удаление подзадачи и загрузка пустого файла")
+    void loadEmptySubtaskList() throws IOException {
         manager.createEpic(epic1);
         manager.createSubtask(subtask1);
         manager.removeSubtask(2);
-        FileBackedTasksManager managerAfterLoading = FileBackedTasksManager.loadFromFile(fileForSaving);
+        FileBackedTasksManager managerAfterLoading = Managers.getFileBackedTasksManager(fileForSaving);
+        managerAfterLoading.loadFromFile();
         assertEquals(0, managerAfterLoading.getSubtaskList().size(), "В списке есть подзадачи");
     }
 
     @Test
-    void shouldLoadHistoryList() throws IOException {
+    @DisplayName("Загрузка истории из файла")
+    void loadHistoryList() throws IOException {
         manager.createEpic(epic1);
         manager.createSubtask(subtask1);
         manager.createTask(task1);
         manager.getEpicById(1);
         manager.getTaskById(3);
         manager.getSubtaskById(2);
-        FileBackedTasksManager managerAfterLoading = FileBackedTasksManager.loadFromFile(fileForSaving);
+        FileBackedTasksManager managerAfterLoading = Managers.getFileBackedTasksManager(fileForSaving);
+        managerAfterLoading.loadFromFile();
         assertEquals(subtask1, managerAfterLoading.getHistory().get(2), "Списки не совпадают");
     }
 }

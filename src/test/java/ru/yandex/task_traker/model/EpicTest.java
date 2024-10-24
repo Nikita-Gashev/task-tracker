@@ -2,6 +2,7 @@ package ru.yandex.task_traker.model;
 
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,7 +30,8 @@ public class EpicTest {
 
 
     @Test
-    void shouldAssignStatusNewWithEmptySubtaskList() {
+    @DisplayName("Статус эпика без подзадач должен быть NEW")
+    void assignStatusNew1() {
         epic.removeSubtasks(subtask1);
         epic.removeSubtasks(subtask2);
         epic.removeSubtasks(subtask3);
@@ -38,27 +40,31 @@ public class EpicTest {
     }
 
     @Test
-    void shouldAssignStatusNewWithAllNewSubtasks() {
+    @DisplayName("Статус эпика с подзадачами NEW должен быть NEW")
+    void assignStatusNewW2() {
         epic.assignStatus();
         assertEquals(TaskStatus.NEW, epic.getStatus());
     }
 
     @Test
-    void shouldAssignStatusInProgressWithNewAndDoneSubtasks() {
+    @DisplayName("Статус эпика с подзадачами NEW и DONE должен быть IN_PROGRESS")
+    void assignStatusInProgress1() {
         subtask1.setStatus(TaskStatus.DONE);
         epic.assignStatus();
         assertEquals(TaskStatus.IN_PROGRESS, epic.getStatus());
     }
 
     @Test
-    void shouldAssignStatusInProgressWithInProgressSubtask() {
+    @DisplayName("Статус эпика с подзадачами IN_PROGRESS должен быть IN_PROGRESS")
+    void assignStatusInProgress2() {
         subtask1.setStatus(TaskStatus.IN_PROGRESS);
         epic.assignStatus();
         assertEquals(TaskStatus.IN_PROGRESS, epic.getStatus());
     }
 
     @Test
-    void shouldAssignStatusDoneWithAllDoneSubtasks() {
+    @DisplayName("Статус эпика с подзадачами DONE должен быть DONE")
+    void assignStatusDone() {
         subtask1.setStatus(TaskStatus.DONE);
         subtask2.setStatus(TaskStatus.DONE);
         subtask3.setStatus(TaskStatus.DONE);
@@ -67,7 +73,8 @@ public class EpicTest {
     }
 
     @Test
-    void shouldStartAndEndWhenSubtask1() {
+    @DisplayName("Время начала, окончания и продолжительность эпика должно совпадать с подзадачей 1")
+    void updateTimeAndDuration1() {
         epic.removeSubtasks(subtask2);
         epic.removeSubtasks(subtask3);
         epic.updateTimeAndDuration();
@@ -77,7 +84,8 @@ public class EpicTest {
     }
 
     @Test
-    void shouldStartWhenSubtask1AndEndWhenSubtask2() {
+    @DisplayName("Время начала эпика по подзадаче 1, окончания - подзадача2, продолжительность - 640 минут")
+    void updateTimeAndDuration2() {
         epic.removeSubtasks(subtask3);
         epic.updateTimeAndDuration();
         assertEquals("20-10-2024 08:40", epic.getStartTime().format(epic.getFormatter()));

@@ -3,14 +3,13 @@ package ru.yandex.task_traker.service;
 import ru.yandex.task_traker.model.Epic;
 import ru.yandex.task_traker.model.Subtask;
 import ru.yandex.task_traker.model.Task;
-import ru.yandex.task_traker.util.EmptyListException;
 
 import java.util.List;
-import java.util.TreeSet;
+import java.util.SortedSet;
 
 public interface TaskManager {
 
-    TreeSet<Task> getPrioritizedTasks() throws EmptyListException;
+    SortedSet<Task> getPrioritizedTasks();
 
     List<Task> getTasksList();
 
