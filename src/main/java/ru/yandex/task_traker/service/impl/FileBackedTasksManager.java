@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
-    private File fileForSaving;
-    private static final String headOfSavingList = "id,type,name,status,description,epic\n";
+    private final File fileForSaving;
+    private static final String HEAD_OF_SAVING_LIST = "id,type,name,status,description,epic,duration,startTime\n";
 
     public FileBackedTasksManager(File fileForSaving) {
         this.fileForSaving = fileForSaving;
@@ -19,15 +19,15 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     private void save() throws ManagerSaveException {
         try (Writer writer = new FileWriter(fileForSaving)) {
-            writer.write(headOfSavingList);
+            writer.write(HEAD_OF_SAVING_LIST);
             for (Task task : super.getTasksList()) {
-                writer.write(task.toString());
+                writer.write(task.toString() + "\n");
             }
             for (Task epic : super.getEpicList()) {
-                writer.write(epic.toString());
+                writer.write(epic.toString() + "\n");
             }
             for (Task subtask : super.getSubtaskList()) {
-                writer.write(subtask.toString());
+                writer.write(subtask.toString() + "\n");
             }
             writer.write("\n");
             for (Task task : super.getHistory()) {
@@ -38,7 +38,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
     }
 
-    private static List<String> readTaskFromFile(File file) throws IOException {
+    private List<String> readTaskFromFile(File file) throws IOException {
         List<String> lines = new ArrayList<>();
         try (FileReader reader = new FileReader(file)) {
             BufferedReader br = new BufferedReader(reader);
@@ -54,7 +54,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return lines;
     }
 
-    private static void makeTasksFromString(String value) {
+    private void makeTasksFromString(String value) {
         Task task;
         switch (value.split(",")[1]) {
             case "TASK":
@@ -70,11 +70,12 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 subtasks.put(task.getId(), (Subtask) task);
                 Epic epic = epics.get(((Subtask) task).getEpicId());
                 epic.getSubtasks().add((Subtask) task);
+                epic.updateTimeAndDuration();
                 break;
         }
     }
 
-    private static List<Integer> readHistoryFromFile(File file) throws IOException {
+    private List<Integer> readHistoryFromFile(File file) throws IOException {
         List<Integer> idTaskInHistory = new ArrayList<>();
         try (FileReader reader = new FileReader(file)) {
             BufferedReader br = new BufferedReader(reader);
@@ -95,16 +96,15 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return idTaskInHistory;
     }
 
-    public static FileBackedTasksManager loadFromFile(File file) throws IOException {
-        FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager(file);
+    public void loadFromFile() throws IOException {
         tasks.clear();
         epics.clear();
         subtasks.clear();
-        historyManager.removeAllHistory();
-        for (String str : readTaskFromFile(file)) {
+        for (String str : readTaskFromFile(fileForSaving)) {
             makeTasksFromString(str);
         }
-        for (Integer id : readHistoryFromFile(file)) {
+        historyManager.removeAllHistory();
+        for (Integer id : readHistoryFromFile(fileForSaving)) {
             if (tasks.containsKey(id)) {
                 historyManager.add(tasks.get(id));
             } else if (epics.containsKey(id)) {
@@ -113,7 +113,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 historyManager.add(subtasks.get(id));
             }
         }
-        return fileBackedTasksManager;
     }
 
     @Override
@@ -177,6 +176,36 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             System.out.println(e.getMessage());
         }
         return epic;
+    }
+
+    @Override
+    public void updateTask(Task task) {
+        super.updateTask(task);
+        try {
+            save();
+        } catch (ManagerSaveException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    @Override
+    public void updateSubtask(Subtask subtask) {
+        super.updateSubtask(subtask);
+        try {
+            save();
+        } catch (ManagerSaveException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    @Override
+    public void updateEpic(Epic epic) {
+        super.updateEpic(epic);
+        try {
+            save();
+        } catch (ManagerSaveException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     @Override
